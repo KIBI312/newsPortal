@@ -16,7 +16,6 @@ public class SecurityConfig {
     private final AppUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public SecurityConfig(AppUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
@@ -30,7 +29,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/").permitAll()
+                .requestMatchers("/", "/register").permitAll()
                 .requestMatchers("/management").hasRole("ADMIN"))
             .formLogin((form) -> form
                 .loginPage("/login")
