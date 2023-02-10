@@ -20,7 +20,7 @@ import com.seitov.news.repository.UserRepository;
 import com.seitov.news.security.AppUserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
-public class AppUserDetailsServiceTests {
+public class AppUserDetailsServiceTest {
     
     @Mock
     UserRepository userRepository;
@@ -30,18 +30,24 @@ public class AppUserDetailsServiceTests {
 
     @Test
     public void loadUserByUsernameSuccessfully() {
+        //given
         User user = new User();
         UserDetails userDetails = user;
         user.setUsername("testUser");
+        //when
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+        //then
         assertEquals(userDetails, userDetailsService.loadUserByUsername("testUser"));
     }
 
     @Test
     public void loadUserByUsernameNonExisting() {
+        //given
         String username = "anyUsername";
+        //when
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(null));
-        Exception ex = assertThrows(UsernameNotFoundException.class, 
+        //then
+        Exception ex = assertThrows(UsernameNotFoundException.class,
                         () -> userDetailsService.loadUserByUsername(username));
         assertEquals("No user found with this username: " + username, ex.getMessage());
     }

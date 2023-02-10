@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,46 +21,50 @@ import com.seitov.news.exception.UserRegistrationException;
 import com.seitov.news.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTests {
+public class AuthServiceTest {
     
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Mock
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    AuthService authService;
+    private AuthService authService;
 
-    @Test
-    public void registerSuccessfully() {
-        RegistrationDto registrationDto = new RegistrationDto();
+    private RegistrationDto registrationDto;
+    private User user;
+
+    @BeforeEach
+    public void initData() {
+        //given
+        registrationDto = new RegistrationDto();
         registrationDto.setUsername("ValidUsername");
         registrationDto.setPassword("somepass123");
         registrationDto.setMatchingPassword("somepass123");
-        User user = new User();
+        user = new User();
         user.setUsername("ValidUsername");
         user.setPassword("$2a$10$rpPgdUYLgmCtZL46nXuZtORdf/ANc99nyxHrJgtO2nzN2WkaqTioa");
         user.setRole("ROLE_USER");
+    }
+
+    @Test
+    public void registerSuccessfully() {
+        //when
         when(userRepository.findByUsername("ValidUsername")).thenReturn(Optional.ofNullable(null));
         when(passwordEncoder.encode("somepass123"))
             .thenReturn("$2a$10$rpPgdUYLgmCtZL46nXuZtORdf/ANc99nyxHrJgtO2nzN2WkaqTioa");
         when(userRepository.save(user)).thenReturn(user);
+        //then
         assertEquals(user, authService.register(registrationDto));
     }
 
     @Test
     public void registerWithExistingUsername() {
-        RegistrationDto registrationDto = new RegistrationDto();
-        registrationDto.setUsername("ValidUsername");
-        registrationDto.setPassword("somepass123");
-        registrationDto.setMatchingPassword("somepass123");
-        User user = new User();
-        user.setUsername("ValidUsername");
-        user.setPassword("$2a$10$rpPgdUYLgmCtZL46nXuZtORdf/ANc99nyxHrJgtO2nzN2WkaqTioa");
-        user.setRole("ROLE_USER");
+        //when
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         Exception ex = assertThrows(UserRegistrationException.class, () -> authService.register(registrationDto));
+        //then
         assertEquals("User with this username already exists!", ex.getMessage());
     }
 

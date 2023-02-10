@@ -11,30 +11,31 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 @ExtendWith(MockitoExtension.class)
-public class RegistrationDtoTests {
-    
+public class RegistrationDtoTest {
+
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
     @Test
     public void isValidWithCorrectData() {
+        //given
         RegistrationDto registrationDto = new RegistrationDto();
         registrationDto.setUsername("ValidUsername");
         registrationDto.setPassword("somepass123");
         registrationDto.setMatchingPassword("somepass123");
+        //then
         assertEquals(validator.validate(registrationDto).size(),0);
     }
 
     @Test
-    public void isValidWithNonMathcingPasswords() {
-
+    public void isValidWithNonMatchingPasswords() {
+        //given
         RegistrationDto registrationDto = new RegistrationDto();
         registrationDto.setUsername("ValidUsername");
         registrationDto.setPassword("somepass123");
         registrationDto.setMatchingPassword("nonmatching");
+        //then
         assertEquals(validator.validate(registrationDto).size(),1);
     }
-
-
 
 }
