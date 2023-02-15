@@ -1,0 +1,18 @@
+version: '3'
+services:
+  db-jenkins:
+    image: postgres
+    container_name: pgdb-jenkins
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=newsPortal
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      jenkins:
+        ipv4_address: 10.5.0.10
+networks:
+  jenkins:
+    name: jenkins
+    external: true
