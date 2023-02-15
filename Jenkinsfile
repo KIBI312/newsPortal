@@ -3,6 +3,7 @@ pipeline {
         docker {
             image 'maven:3.8.7-eclipse-temurin-17'
             args '-v /root/.m2:/root/.m2'
+            args '--net=jenkins'
         }
     }
     stages {

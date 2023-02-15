@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://172.19.0.3:5432/newsPortal
+    url: jdbc:postgresql://172.20.0.2:5432/newsPortal
     username: user
     password: password
   jpa:
