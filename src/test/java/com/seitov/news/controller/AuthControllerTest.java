@@ -46,8 +46,22 @@ public class AuthControllerTest {
     @Test
     public void getRegister() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get("/register"))
-                    .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk()).andReturn();
         assertTrue(mvcResult.getResponse().getContentAsString().contains("Register"));
+    }
+
+    @Test
+    public void getLoginInRussian() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/login?lang=ru"))
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("Войти"));
+    }
+
+    @Test
+    public void getRegisterInRussian() throws Exception {
+        MvcResult mvcResult = this.mockMvc.perform(get("/register?lang=ru"))
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(mvcResult.getResponse().getContentAsString().contains("Зарегистрироваться"));
     }
 
     @Test
@@ -117,5 +131,4 @@ public class AuthControllerTest {
         assertTrue(mvcResult.getResponse().getContentAsString().contains("User with this username already exists!"));
     }
 
-    
 }
