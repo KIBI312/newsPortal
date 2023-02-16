@@ -9,6 +9,15 @@
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   </head>
   <body>
+    <header class="d-flex justify-content-end pt-3 pb-0">
+      <div class="dropdown px-5">
+        <button th:text="#{lang.change}" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+        <ul class="dropdown-menu">
+          <li><a th:text="#{lang.ru}" th:href="@{/register(lang=ru)}" class="dropdown-item" href="#"></a></li>
+          <li><a th:text="#{lang.us}" th:href="@{/register(lang=us)}" class="dropdown-item" href="#"></a></li>
+        </ul>
+      </div>
+    </header>
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -16,26 +25,31 @@
             <div class="card-body p-5 text-center">
               <div class="mb-md-2 mt-md-2 pb-2">
                 <form th:action="@{/register}" th:object="${registrationDto}" method="post">
-                  <h2 class="mb-5 text-uppercase">Sign up</h2>
+                  <h2 th:text="#{signUp}" class="mb-5 text-uppercase"></h2>
                   <div class="form-light mb-4">
-                    <p th:if="${error}" th:text="${error}"></p>
+                    <p th:if="${error}" th:text="#{userExistsError}"></p>
                     <label for="username" class="visually-hidden">Username</label>
-                    <p class="small mb-0" th:if="${#fields.hasErrors('username')}" th:errorclass="error" th:errors="*{username}"/>
-                    <input type="text" th:field="*{username}" class="form-control form-control-lg" placeholder="Username" required/>
+                    <p class="small mb-0" th:if="${#fields.hasErrors('username')}" th:text="#{usernameLengthError}"/>
+                    <input type="text" th:field="*{username}" class="form-control form-control-lg" th:placeholder="#{username}" required/>
                   </div>
                   <div class="form-light mb-4">
                     <label for="password" class="visually-hidden">Password</label>
-                    <p class="small mb-0" th:if="${#fields.hasErrors('password')}" th:errorclass="error" th:errors="*{password}"/>
-                    <input type="password" th:field="*{password}" class="form-control form-control-md" placeholder="Password"/>
+                    <p class="small mb-0" th:if="${#fields.hasErrors('password')}" th:text="#{passwordLengthError}"/>
+                    <input type="password" th:field="*{password}" class="form-control form-control-md" th:placeholder="#{password}"/>
                   </div>
                   <div class="form-light mb-4">
                     <label for="matchingPassword" class="visually-hidden">Confirm password</label>
-                    <p class="small mb-0" th:if="${#fields.hasErrors('matchingPassword')}" th:errorclass="error" th:errors="*{matchingPassword}"/>
-                    <input type="password" th:field="*{matchingPassword}" class="form-control form-control-md" placeholder="Confirm password"/>
+                    <p class="small mb-0" th:if="${#fields.hasErrors('matchingPassword')}" th:text="#{confirmPasswordError}"/>
+                    <input type="password" th:field="*{matchingPassword}" class="form-control form-control-md" th:placeholder="#{confirmPassword}"/>
                   </div>                     
-                  <button class="btn btn-outline-light btn-lg px-5 mb-5" type="submit">Register</button><br/>
-                  <p class="mb-1">Already registered? <a href="/login" th:href="@{/login}" class="text-light fw-bold">Sign In</a>
-                  <p class="small mb-0 pb-lg-2"><a class="text-light" href="/" th:href="@{/}">Back to home page</a></p>
+                  <button th:text="#{register}" class="btn btn-outline-light btn-lg px-5 mb-5" type="submit"></button><br/>
+                  <p class="mb-1">
+                    <span th:text="#{toSignIn}"></span>
+                    <a th:text="#{signIn}" th:href="@{/login}" class="text-light fw-bold"></a>
+                  </p>
+                  <p class="small mb-0 pb-lg-2">
+                    <a th:text="#{backToHome}" th:href="@{/}" class="text-light">Back to home page</a>
+                  </p>
                 </form>
               </div>
             </div>
