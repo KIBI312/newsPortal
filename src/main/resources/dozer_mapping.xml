@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mappings xmlns="http://dozermapper.github.io/schema/bean-mapping"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozermapper.github.io/schema/bean-mapping
+          https://dozermapper.github.io/schema/bean-mapping.xsd">
+    <mapping>
+        <class-a>com.seitov.news.entity.News</class-a>
+        <class-b>com.seitov.news.dto.NewsDto</class-b>
+        <field>
+            <a>id</a>
+            <b>articleId</b>
+        </field>
+        <field>
+            <a>brief</a>
+            <b>description</b>
+        </field>
+    </mapping>
+</mappings>
