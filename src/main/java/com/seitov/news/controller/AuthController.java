@@ -12,9 +12,9 @@ import com.seitov.news.dto.RegistrationDto;
 import com.seitov.news.exception.UserRegistrationException;
 import com.seitov.news.service.AuthService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @Controller
 public class AuthController {
