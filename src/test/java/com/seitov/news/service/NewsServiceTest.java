@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,17 +50,22 @@ public class NewsServiceTest {
                     source.getBrief(), source.getContent(), source.getPublishedAt())).limit(10).collect(Collectors.toList());
     }
 
+    private void mockMapper() {
+        //when
+        when(orikaMapper.map(any(News.class), eq(NewsDto.class))).thenAnswer(source -> {
+            News newsObj = (News) source.getArguments()[0];
+            return new NewsDto(newsObj.getId(), newsObj.getTitle(), newsObj.getBrief(),
+                    newsObj.getContent(), newsObj.getPublishedAt());
+        });
+    }
+
     @Test
     public void getNewsSuccessfully() {
         //given
         Pageable pageable = PageRequest.of(0, 10);
         //when
         when(newsRepository.findAllByOrderByPublishedAtDesc(pageable)).thenReturn(news.subList(0, 10));
-        when(orikaMapper.map(any(News.class), eq(NewsDto.class))).thenAnswer(source -> {
-            News newsObj = (News) source.getArguments()[0];
-            return new NewsDto(newsObj.getId(), newsObj.getTitle(), newsObj.getBrief(),
-                    newsObj.getContent(), newsObj.getPublishedAt());
-        });
+        mockMapper();
         //then
         assertEquals(newsService.getNews(pageable), newsDtos);
     }
@@ -72,6 +79,27 @@ public class NewsServiceTest {
         //then
         Exception ex = assertThrows(ResourceNotFoundException.class, () -> newsService.getNews(pageable));
         assertEquals("Requested page does not exist!", ex.getMessage());
+    }
+
+    @Test
+    public void getNewsViewPageSuccessfully() {
+        //given
+        News newsObj = news.get(0);
+        NewsDto newsDto = newsDtos.get(0);
+        //when
+        when(newsRepository.findById(newsObj.getId())).thenReturn(Optional.of(newsObj));
+        mockMapper();
+        //then
+        assertEquals(newsDto, newsService.getNewsById(newsObj.getId()));
+    }
+
+    @Test
+    public void getNewsViewWithNonExistingId() {
+        //when
+        when(newsRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+        //then
+        Exception ex = assertThrows(ResourceNotFoundException.class, () -> newsService.getNewsById(UUID.randomUUID()));
+        assertEquals("Requested news does not exist!", ex.getMessage());
     }
 
 }
