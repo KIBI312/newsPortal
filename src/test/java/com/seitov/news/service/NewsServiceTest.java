@@ -1,0 +1,77 @@
+package com.seitov.news.service;
+
+import com.seitov.news.dto.NewsDto;
+import com.seitov.news.entity.News;
+import com.seitov.news.exception.ResourceNotFoundException;
+import com.seitov.news.repository.NewsRepository;
+import com.seitov.news.supplier.NewsSupplier;
+import ma.glasnost.orika.MapperFacade;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class NewsServiceTest {
+
+    @Mock
+    private NewsRepository newsRepository;
+    @Mock
+    private MapperFacade orikaMapper;
+
+    @InjectMocks
+    private NewsService newsService;
+
+    private List<NewsDto> newsDtos;
+    private List<News> news = new ArrayList<>();
+
+    @BeforeEach
+    public void initData() {
+        //given
+        news.addAll(Stream.generate(NewsSupplier::randomNews).limit(30).collect(Collectors.toList()));
+        newsDtos = news.subList(0,10).stream().map(source -> new NewsDto(source.getId(), source.getTitle(),
+                    source.getBrief(), source.getContent(), source.getPublishedAt())).limit(10).collect(Collectors.toList());
+    }
+
+    @Test
+    public void getNewsSuccessfully() {
+        //given
+        Pageable pageable = PageRequest.of(0, 10);
+        //when
+        when(newsRepository.findAllByOrderByPublishedAtDesc(pageable)).thenReturn(news.subList(0, 10));
+        when(orikaMapper.map(any(News.class), eq(NewsDto.class))).thenAnswer(source -> {
+            News newsObj = (News) source.getArguments()[0];
+            return new NewsDto(newsObj.getId(), newsObj.getTitle(), newsObj.getBrief(),
+                    newsObj.getContent(), newsObj.getPublishedAt());
+        });
+        //then
+        assertEquals(newsService.getNews(pageable), newsDtos);
+    }
+
+    @Test
+    public void getNewsNonExistingPage() {
+        //given
+        Pageable pageable = PageRequest.of(10,10);
+        //when
+        when(newsRepository.findAllByOrderByPublishedAtDesc(pageable)).thenReturn(new ArrayList<News>());
+        //then
+        Exception ex = assertThrows(ResourceNotFoundException.class, () -> newsService.getNews(pageable));
+        assertEquals("Requested page does not exist!", ex.getMessage());
+    }
+
+}
