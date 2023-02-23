@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title th:text="#{newsHeadline}"></title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header class="row pt-3 pb-0">
+      <div class="col-3 offset-1">
+        <h1 th:text="#{newsHeadline}"></h1>
+      </div>
+      <div class="col-3 offset-2">
+        <div sec:authorize="!isAuthenticated()">
+          <a class="btn btn-primary" th:text="#{signIn}" th:href="@{/login}"></a>
+          <a class="btn btn-primary" th:text="#{signUp}" th:href="@{/register}"></a>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+          <form th:action="@{/logout}" method="post">
+            <input class="btn btn-primary" type="submit" th:value="#{logout}">
+          </form>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="dropdown justify-content-end px-5">
+          <button th:text="#{lang.change}" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+          <ul class="dropdown-menu">
+            <li><a th:text="#{lang.ru}" th:href="@{/news/{id}(lang=ru, id=${article.articleId})}" class="dropdown-item" href="#"></a></li>
+            <li><a th:text="#{lang.us}" th:href="@{/news/{id}(lang=us, id=${article.articleId})}" class="dropdown-item" href="#"></a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <div class="card bg-light text-dark mb-2 mx-5">
+      <div class="card-body">
+        <h5 class="px-4 card-title" th:text="${article.title}"></h5>
+        <p class="card-text" th:text="${article.description}"></p>
+        <p class="card-text" th:text="${article.content}"></p>
+        <div class="text-end">
+          <p class="card-text" th:text="${#temporals.format(article.publishedAt, 'MM/dd/yyyy')}"></p>
+        </div>
+      </div>
+    </div>
+    <a th:text="#{backToHome}" class="btn btn-primary m-5" th:href="@{/}"></a>
+  </body>
+</html>
