@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class    SecurityConfig {
     
     private final AppUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -30,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> requests
                         .antMatchers("/", "/register", "/login").permitAll()
-                        .antMatchers("/management").hasRole("ADMIN"))
+                        .antMatchers("/management", "/management/**").hasRole("ADMIN"))
             .formLogin((form) -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true).permitAll())
