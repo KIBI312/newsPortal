@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class NewsServiceTest {
                     source.getBrief(), source.getContent(), source.getPublishedAt())).limit(10).collect(Collectors.toList());
     }
 
-    private void mockMapper() {
+    private void mockMapperNewsToNewsDto() {
         //when
         when(orikaMapper.map(any(News.class), eq(NewsDto.class))).thenAnswer(source -> {
             News newsObj = (News) source.getArguments()[0];
@@ -59,13 +60,32 @@ public class NewsServiceTest {
         });
     }
 
+    private void mockMapperNewsDtoToNews() {
+        //when
+        when(orikaMapper.map(any(NewsDto.class), eq(News.class))).thenAnswer(source -> {
+            NewsDto newsDto = (NewsDto) source.getArguments()[0];
+            News newsObj = new News();
+            newsObj.setId(newsDto.getArticleId());
+            newsObj.setTitle(newsDto.getTitle());
+            newsObj.setContent(newsDto.getContent());
+            newsObj.setBrief(newsDto.getDescription());
+            newsObj.setPublishedAt(newsDto.getPublishedAt());
+            return newsObj;
+        });
+    }
+
+    private void mockRepositorySave() {
+        //when
+        when(newsRepository.save(any(News.class))).thenAnswer(source -> source.getArguments()[0]);
+    }
+
     @Test
     public void getNewsSuccessfully() {
         //given
         Pageable pageable = PageRequest.of(0, 10);
         //when
         when(newsRepository.findAllByOrderByPublishedAtDesc(pageable)).thenReturn(news.subList(0, 10));
-        mockMapper();
+        mockMapperNewsToNewsDto();
         //then
         assertEquals(newsService.getNews(pageable), newsDtos);
     }
@@ -88,7 +108,7 @@ public class NewsServiceTest {
         NewsDto newsDto = newsDtos.get(0);
         //when
         when(newsRepository.findById(newsObj.getId())).thenReturn(Optional.of(newsObj));
-        mockMapper();
+        mockMapperNewsToNewsDto();
         //then
         assertEquals(newsDto, newsService.getNewsById(newsObj.getId()));
     }
@@ -99,6 +119,43 @@ public class NewsServiceTest {
         when(newsRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
         //then
         Exception ex = assertThrows(ResourceNotFoundException.class, () -> newsService.getNewsById(UUID.randomUUID()));
+        assertEquals("Requested news does not exist!", ex.getMessage());
+    }
+
+    @Test
+    public void addNewsSuccessfully() {
+        //given
+        NewsDto newsDto = new NewsDto(UUID.randomUUID(), "title", "description", "content", LocalDateTime.now());
+        //when
+        mockMapperNewsToNewsDto();
+        mockMapperNewsDtoToNews();
+        mockRepositorySave();
+        //then
+        assertEquals(newsDto, newsService.addNews(newsDto));
+    }
+
+    @Test
+    public void updateNewsSuccessfully() {
+        //given
+        NewsDto newsDto = newsDtos.get(0);
+        News newsObj = news.get(0);
+        //when
+        mockRepositorySave();
+        mockMapperNewsToNewsDto();
+        mockMapperNewsDtoToNews();
+        when(newsRepository.findById(newsDto.getArticleId())).thenReturn(Optional.of(newsObj));
+        //then
+        assertEquals(newsDto, newsService.updateNews(newsDto));
+    }
+
+    @Test
+    public void updateNonExistingNews() {
+        //given
+        NewsDto newsDto = newsDtos.get(0);
+        //when
+        when(newsRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(null));
+        //then
+        Exception ex = assertThrows(ResourceNotFoundException.class, () -> newsService.updateNews(newsDto));
         assertEquals("Requested news does not exist!", ex.getMessage());
     }
 
