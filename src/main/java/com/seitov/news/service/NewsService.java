@@ -8,8 +8,10 @@ import ma.glasnost.orika.MapperFacade;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,6 +42,28 @@ public class NewsService {
         return orikaMapper.map(news.get(), NewsDto.class);
     }
 
+    public NewsDto addNews(NewsDto newsDto) {
+        News news = orikaMapper.map(newsDto, News.class);
+        return orikaMapper.map(newsRepository.save(news), NewsDto.class);
+    }
+
+    public NewsDto updateNews(NewsDto newsDto) {
+        Optional<News> news = newsRepository.findById(newsDto.getArticleId());
+        if(news.isEmpty()) {
+            throw new ResourceNotFoundException("Requested news does not exist!");
+        }
+        News updatedNews = orikaMapper.map(newsDto, News.class);
+        updatedNews.setLastModifiedAt(LocalDateTime.now());
+        return orikaMapper.map(newsRepository.save(updatedNews), NewsDto.class);
+    }
+
+    public void deleteById(UUID id) {
+        newsRepository.deleteById(id);
+    }
+
+    public void deleteAllById(Set<UUID> ids) {
+        newsRepository.deleteAllById(ids);
+    }
 
 
 }
