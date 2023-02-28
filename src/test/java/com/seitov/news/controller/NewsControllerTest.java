@@ -103,9 +103,4 @@ public class NewsControllerTest {
         assertTrue(result.getResponse().getContentAsString().contains("Requested news does not exist!"));
     }
 
-
-
-
-
-
 }
