@@ -13,16 +13,6 @@ services:
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - newsPortal
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4
-    ports:
-      - "9090:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=user@sample.com
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASS}
-    networks:
-      - newsPortal
 networks:
   newsPortal:
     name: newsPortal
